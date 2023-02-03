@@ -21,28 +21,46 @@ fastify.get('/email/:email', async (req, res) => {
     res.send(items);
 })
 
-// Send data to database
+const EventEmitter = require('events');
+
+const eventEmitter = new EventEmitter();
+
 fastify.post('/send', async (req, res) => {
     try {
         const { name, mobileNumber, email } = req.body;
-        const result = await db.put({
-            name: name,
-            mobileNumber: mobileNumber,
-            email: email
-        });
+        eventEmitter.emit('dataInsert', { name, mobileNumber, email });
+        console.log("Data Insertion Event Emitted");
         res.status(200).send({
-            "msg": "Successful Data Inserted",
-            "data": result
+            "msg": "Data Insertion Event Emitted"
         });
 
     } catch (err) {
-        res.status(500).send(err);
+        console.error(err);
+        res.status(500).send({
+            "msg": "Error emitting data insertion event"
+        });
     }
-})
+});
+
+eventEmitter.on('dataInsert', (data) => {
+    try {
+        const result = db.put(data);
+        console.log("Successful Data Inserted");
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 fastify.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
     await db.delete(id);
+    res.send({"message": "deleted"})
+});
+
+fastify.delete('/email/:email', async (req, res) => {
+    const { email } = req.params;
+    await db.delete(email);
     res.send({"message": "deleted"})
 });
 
