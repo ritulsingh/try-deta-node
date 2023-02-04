@@ -3,7 +3,7 @@ const autocannon = require('autocannon');
 async function test() {
     const instance = autocannon({
         title: "Autocannon Test For API",
-        url: 'https://r5ndxf.deta.dev',
+        url: 'https://1nqdfd.deta.dev',
         connections: 1000,
         duration: 100,
         requests: [

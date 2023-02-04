@@ -7,7 +7,7 @@ export let options = {
 };
 
 export default function() {
-  let res = http.post("https://r5ndxf.deta.dev/send", JSON.stringify({
+  let res = http.post("https://1nqdfd.deta.dev/send", JSON.stringify({
     name: "Ritul Singh",
     mobileNumber: 9205732793,
     email: "ritulsingh00@gmail.com"
