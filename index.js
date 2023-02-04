@@ -10,58 +10,53 @@ const db = deta.Base('simpleDB');
 
 // Get all Data from database
 fastify.get('/', async (request, res) => {
-    const item = await db.fetch();
-    res.send(item)
+    try {
+        const item = await db.fetch();
+        res.send(item)
+    } catch (error) {
+        res.send(error)
+    }
 })
 
-// Get Data by mobile number
+// Get Data by email
 fastify.get('/email/:email', async (req, res) => {
-    const { email } = req.params;
-    const items = await db.fetch({ 'email': email });
-    res.send(items);
+    try {
+        const { email } = req.params;
+        const items = await db.fetch({ 'email': email });
+        res.send(items);
+    } catch (error) {
+        res.send(error);
+    }
 })
 
-const EventEmitter = require('events');
-
-const eventEmitter = new EventEmitter();
-
+// Add data to database
 fastify.post('/send', async (req, res) => {
     try {
         const { name, mobileNumber, email } = req.body;
-        eventEmitter.emit('dataInsert', { name, mobileNumber, email });
-        console.log("Data Insertion Event Emitted");
-        res.status(200).send({
-            "msg": "Data Insertion Event Emitted"
+        const result = await db.put({
+            name: name,
+            mobileNumber: mobileNumber,
+            email: email
         });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({
-            "msg": "Error emitting data insertion event"
-        });
-    }
-});
-
-eventEmitter.on('dataInsert', (data) => {
-    try {
-        const result = db.put(data);
         console.log("Successful Data Inserted");
+        res.status(200).send({
+            "msg": "Successful Data Inserted",
+            "data": result
+        });
     } catch (err) {
-        console.error(err);
+        res.status(500).send(err);
     }
-});
+})
 
-
+// Delete by id
 fastify.delete('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    await db.delete(id);
-    res.send({"message": "deleted"})
-});
-
-fastify.delete('/email/:email', async (req, res) => {
-    const { email } = req.params;
-    await db.delete(email);
-    res.send({"message": "deleted"})
+    try {
+        const { id } = req.params;
+        await db.delete(id);
+        res.send({ "message": "deleted" })
+    } catch (error) {
+        res.send(error);
+    }
 });
 
 // Start Local server listening for requests
